@@ -2,6 +2,10 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.0.6'
     id 'io.spring.dependency-management' version '1.1.7'
+
+    id 'com.diffplug.spotless' version '8.5.1'
+    id 'checkstyle'
+    id 'com.github.spotbugs' version '6.5.5'
 }
 
 group = 'com.team6'
@@ -21,15 +25,64 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-    runtimeOnly "io.micrometer:micrometer-registry-prometheus"
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     implementation 'net.ttddyy:datasource-proxy:1.11.0'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+
+        removeUnusedImports()
+
+        importOrder(
+                'java',
+                'javax',
+                'org',
+                'com',
+                ''
+        )
+
+        trimTrailingWhitespace()
+        endWithNewline()
+
+        targetExclude(
+                'build/generated/**',
+                'build/**'
+        )
+    }
+
+    format 'misc', {
+        target '*.gradle', '*.md', '.gitignore', '*.yml', '*.yaml'
+
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+checkstyle {
+    toolVersion = '13.4.2'
+    configFile = file('config/checkstyle/checkstyle.xml')
+}
+
+spotbugs {
+    effort = 'max'
+    reportLevel = 'low'
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    reports {
+        html.required = true
+        xml.required = false
+    }
 }
 
 bootJar {
