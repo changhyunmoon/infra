@@ -61,7 +61,7 @@ spotless {
     }
 
     format 'misc', {
-        target '*.gradle', '*.md', '.gitignore', '*.yml', '*.yaml'
+        target '*.gradle', '.gitignore', '*.yml', '*.yaml'
 
         trimTrailingWhitespace()
         endWithNewline()
